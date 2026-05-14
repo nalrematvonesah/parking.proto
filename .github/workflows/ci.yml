@@ -39,15 +39,23 @@ jobs:
       - name: Generate Go code
         run: |
           export PATH="$PATH:$(go env GOPATH)/bin"
-          ./scripts/generate.sh
+          find gen -name .gitkeep -delete || true
+          bash ./scripts/generate.sh
 
       - name: Check that committed gen/ matches regenerated
         run: |
+          echo "::group::files under gen/"
+          find gen -type f | sort
+          echo "::endgroup::"
           if [ -n "$(git status --porcelain gen/)" ]; then
-            echo "::error::generated code is out of date. Run ./scripts/generate.sh and commit the result."
-            git --no-pager diff gen/
+            echo "::error::generated code is out of date. Run ./scripts/generate.sh locally and commit the result."
+            git --no-pager status gen/
+            git --no-pager diff gen/ || true
             exit 1
           fi
+
+      - name: Tidy go.mod
+        run: go mod tidy
 
       - name: go build
         run: go build ./...
