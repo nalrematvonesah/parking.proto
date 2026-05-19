@@ -4,18 +4,16 @@ package parking.v1;
 
 option go_package = "github.com/nalrematvonesah/parking.proto/gen/parking/v1;parkingv1";
 
-// ParkingService manages parking slots and their availability.
 service ParkingService {
-  // AssignSlot reserves a free slot and marks it occupied.
   rpc AssignSlot(AssignSlotRequest) returns (AssignSlotResponse);
-  // ReleaseSlot frees a previously occupied slot.
   rpc ReleaseSlot(ReleaseSlotRequest) returns (Empty);
-  // GetAvailableSlots returns the number of free slots.
   rpc GetAvailableSlots(Empty) returns (AvailableSlotsResponse);
+  rpc GetSlot(GetSlotRequest) returns (SlotResponse);         
+  rpc ListAllSlots(Empty) returns (ListSlotsResponse);       
+  rpc AddSlots(AddSlotsRequest) returns (Empty);              
 }
 
 message AssignSlotRequest {
-  // Optional idempotency key from the caller (e.g. session service).
   string request_id = 1;
 }
 
@@ -28,6 +26,23 @@ message ReleaseSlotRequest {
 }
 
 message AvailableSlotsResponse {
+  int32 count = 1;
+}
+
+message GetSlotRequest {
+  int64 slot_id = 1;
+}
+
+message SlotResponse {
+  int64 slot_id = 1;
+  bool is_occupied = 2;
+}
+
+message ListSlotsResponse {
+  repeated SlotResponse slots = 1;
+}
+
+message AddSlotsRequest {
   int32 count = 1;
 }
 
